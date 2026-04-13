@@ -43,15 +43,17 @@
                 Skip-LuaWhitespace
                 $key = Read-LuaValue
                 Skip-LuaWhitespace
-                if ($script:luaPos -lt $script:luaString.Length -and
-                    $script:luaString[$script:luaPos] -eq ']') {
-                    $script:luaPos++ # skip ]
+                if ($script:luaPos -ge $script:luaString.Length -or
+                    $script:luaString[$script:luaPos] -ne ']') {
+                    throw "Expected ']' after bracket key in Lua table."
                 }
+                $script:luaPos++ # skip ]
                 Skip-LuaWhitespace
-                if ($script:luaPos -lt $script:luaString.Length -and
-                    $script:luaString[$script:luaPos] -eq '=') {
-                    $script:luaPos++ # skip =
+                if ($script:luaPos -ge $script:luaString.Length -or
+                    $script:luaString[$script:luaPos] -ne '=') {
+                    throw "Expected '=' after bracket key in Lua table."
                 }
+                $script:luaPos++ # skip =
                 Skip-LuaWhitespace
                 $value = Read-LuaValue
                 $entries.Add(@{ Key = [string]$key; Value = $value })
@@ -101,11 +103,14 @@
 
             Skip-LuaWhitespace
 
-            # Skip comma or semicolon separator
-            if ($script:luaPos -lt $script:luaString.Length -and
-                ($script:luaString[$script:luaPos] -eq ',' -or
-                $script:luaString[$script:luaPos] -eq ';')) {
-                $script:luaPos++
+            # Lua requires a comma or semicolon between fields unless the next token is }
+            if ($script:luaPos -lt $script:luaString.Length) {
+                if ($script:luaString[$script:luaPos] -eq ',' -or
+                    $script:luaString[$script:luaPos] -eq ';') {
+                    $script:luaPos++
+                } elseif ($script:luaString[$script:luaPos] -ne '}') {
+                    throw "Expected ',', ';', or '}' in Lua table constructor."
+                }
             }
         }
 

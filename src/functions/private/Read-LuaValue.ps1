@@ -38,15 +38,19 @@
             return Read-LuaString -QuoteChar "'"
         }
 
-        # Multi-line string [[ ... ]]
+        # Multi-line string [[ ... ]] or [=[ ... ]=]
         if ($char -eq '[' -and
             $script:luaPos + 1 -lt $script:luaString.Length -and
-            $script:luaString[$script:luaPos + 1] -eq '[') {
+            ($script:luaString[$script:luaPos + 1] -eq '[' -or
+            $script:luaString[$script:luaPos + 1] -eq '=')) {
             return Read-LuaMultiLineString
         }
 
-        # Number or negative number
+        # Number or negative number (including .5 style floats)
         if ($char -match '[0-9]' -or
+            ($char -eq '.' -and
+            $script:luaPos + 1 -lt $script:luaString.Length -and
+            $script:luaString[$script:luaPos + 1] -match '[0-9]') -or
             ($char -eq '-' -and
             $script:luaPos + 1 -lt $script:luaString.Length -and
             $script:luaString[$script:luaPos + 1] -match '[0-9.]')) {

@@ -34,7 +34,7 @@ Write-Output "Name: $($result.name)"
 Write-Output "Player Width: $($result.unitframes.playerWidth)"
 
 # Convert Lua to PSCustomObject
-$obj = '{ server = "localhost", port = 8080 }' | ConvertFrom-Lua -AsObject
+$obj = '{ server = "localhost", port = 8080 }' | ConvertFrom-Lua
 Write-Output "Server: $($obj.server), Port: $($obj.port)"
 
 # Compressed output

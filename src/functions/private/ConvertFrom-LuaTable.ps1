@@ -48,6 +48,12 @@
 
         $result = Read-LuaValue
 
+        Skip-LuaWhitespace
+        if ($script:luaPos -lt $script:luaString.Length) {
+            $remainingInput = $script:luaString.Substring($script:luaPos)
+            throw "Unexpected trailing content after Lua value at position $($script:luaPos): $remainingInput"
+        }
+
         return $result
     }
 

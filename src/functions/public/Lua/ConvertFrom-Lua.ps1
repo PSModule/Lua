@@ -72,6 +72,7 @@
 
         # Max nesting depth allowed in input. Throws a terminating error when exceeded.
         [Parameter()]
+        [ValidateRange(0, 1024)]
         [int] $Depth = 1024,
 
         # Output arrays as a single object instead of enumerating elements through the pipeline.

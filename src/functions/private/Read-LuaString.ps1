@@ -104,6 +104,35 @@
                             throw 'Invalid \u escape sequence.'
                         }
                     }
+                    "`n" {
+                        $null = $result.Append("`n")
+                        $script:luaPos++
+                        if (
+                            $script:luaPos -lt $script:luaString.Length -and
+                            $script:luaString[$script:luaPos] -eq "`r"
+                        ) {
+                            $script:luaPos++
+                        }
+                    }
+                    "`r" {
+                        $null = $result.Append("`n")
+                        $script:luaPos++
+                        if (
+                            $script:luaPos -lt $script:luaString.Length -and
+                            $script:luaString[$script:luaPos] -eq "`n"
+                        ) {
+                            $script:luaPos++
+                        }
+                    }
+                    'z' {
+                        $script:luaPos++
+                        while (
+                            $script:luaPos -lt $script:luaString.Length -and
+                            [char]::IsWhiteSpace($script:luaString[$script:luaPos])
+                        ) {
+                            $script:luaPos++
+                        }
+                    }
                     default {
                         # \ddd - decimal byte sequence (1-3 digits)
                         if ($nextChar -match '[0-9]') {

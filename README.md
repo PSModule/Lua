@@ -69,7 +69,7 @@ $luaOutput | Set-Content -Path 'settings.lua'
 ### Example 6: Convert Lua to PSCustomObject
 
 ```powershell
-$result = '{ server = "localhost", port = 8080 }' | ConvertFrom-Lua -AsObject
+$result = '{ server = "localhost", port = 8080 }' | ConvertFrom-Lua
 $result.server  # localhost
 $result.port    # 8080
 ```
