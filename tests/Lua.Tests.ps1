@@ -142,10 +142,9 @@ Describe 'ConvertFrom-Lua' {
         }
 
         It 'Handles escaped single quote in single-quoted string' {
-            $result = ConvertFrom-Lua -InputObject "'it'\''s'"
-            # Actually Lua uses \' inside single-quoted strings
-            $result2 = ConvertFrom-Lua -InputObject "'it\''s'"
-            $result2 | Should -Be "it's"
+            # Lua uses \' inside single-quoted strings
+            $result = ConvertFrom-Lua -InputObject "'it\'s'"
+            $result | Should -Be "it's"
         }
     }
 
@@ -217,7 +216,7 @@ Describe 'ConvertFrom-Lua' {
             if ($result -is [System.Collections.IDictionary]) {
                 $result.Count | Should -Be 0
             } else {
-                $result.PSObject.Properties.Count | Should -Be 0
+                @($result.PSObject.Properties).Count | Should -Be 0
             }
         }
 
@@ -1007,21 +1006,21 @@ Describe 'Round-trip conversion' {
         It 'Round-trips a full config-like structure (5+ levels)' {
             $original = [ordered]@{
                 app = [ordered]@{
-                    name    = 'MyApp'
+                    name = 'MyApp'
                     version = '2.0'
                     modules = [ordered]@{
                         auth = [ordered]@{
-                            enabled  = $true
+                            enabled = $true
                             provider = [ordered]@{
-                                type     = 'oauth'
+                                type = 'oauth'
                                 settings = [ordered]@{
                                     clientId = 'abc123'
-                                    scopes   = @('read', 'write', 'admin')
+                                    scopes = @('read', 'write', 'admin')
                                 }
                             }
                         }
                         logging = [ordered]@{
-                            level   = 'info'
+                            level = 'info'
                             outputs = @(
                                 [ordered]@{ type = 'console'; colored = $true },
                                 [ordered]@{ type = 'file'; path = '/var/log/app.log' }
@@ -1105,8 +1104,8 @@ Describe 'Round-trip conversion' {
 
         It 'Round-trips strings with special characters' {
             $original = [ordered]@{
-                escaped  = "line1`nline2`ttab"
-                quoted   = 'she said "hi"'
+                escaped = "line1`nline2`ttab"
+                quoted = 'she said "hi"'
                 backslash = 'C:\path\to\file'
             }
             $lua = ConvertTo-Lua -InputObject $original -Depth 5
@@ -1119,8 +1118,8 @@ Describe 'Round-trip conversion' {
         It 'Round-trips unicode strings' {
             $original = [ordered]@{
                 greeting = 'Héllo Wörld'
-                emoji    = 'test'
-                cjk      = '日本語'
+                emoji = 'test'
+                cjk = '日本語'
             }
             $lua = ConvertTo-Lua -InputObject $original -Depth 5
             $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
@@ -1131,15 +1130,15 @@ Describe 'Round-trip conversion' {
         It 'Round-trips deeply nested array-of-objects-with-arrays' {
             $original = @(
                 [ordered]@{
-                    name   = 'group1'
-                    items  = @(
+                    name = 'group1'
+                    items = @(
                         [ordered]@{ id = 1; tags = @('a', 'b') },
                         [ordered]@{ id = 2; tags = @('c') }
                     )
                 },
                 [ordered]@{
-                    name   = 'group2'
-                    items  = @(
+                    name = 'group2'
+                    items = @(
                         [ordered]@{ id = 3; tags = @('d', 'e', 'f') }
                     )
                 }

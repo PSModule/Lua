@@ -86,7 +86,11 @@
         if ($AsArray -and $InputObject -isnot [System.Collections.IList]) {
             $objectToConvert = @(, $InputObject)
         }
-        ConvertTo-LuaTable -InputObject $objectToConvert -CurrentDepth 0 -MaxDepth $Depth -Compress:$Compress -EnumsAsStrings:$EnumsAsStrings
+        ConvertTo-LuaTable -InputObject $objectToConvert `
+            -CurrentDepth 0 `
+            -MaxDepth $Depth `
+            -Compress:$Compress `
+            -EnumsAsStrings:$EnumsAsStrings
     }
 
     end {}

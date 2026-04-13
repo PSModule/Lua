@@ -1,4 +1,4 @@
-{
+return {
     integers = {1, 2, 3, 42, -7, 0},
     floats = {3.14, -2.5, 0.001, 1e10},
     booleans = {true, false},

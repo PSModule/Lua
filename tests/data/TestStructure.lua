@@ -1,4 +1,4 @@
-{
+return {
     name = "ElvUI",
     version = "13.74",
     enabled = true,

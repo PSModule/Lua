@@ -1,4 +1,4 @@
-{
+return {
     simpleString = "hello",
     escapedQuote = "she said \"hi\"",
     newlineString = "line1\nline2",

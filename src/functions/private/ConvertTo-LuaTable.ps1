@@ -78,14 +78,26 @@
         }
 
         if ($InputObject -is [string]) {
-            $escaped = $InputObject -replace '\\', '\\' -replace '"', '\"' -replace "`0", '\0' -replace "`a", '\a' -replace "`b", '\b' -replace "`f", '\f' -replace "`n", '\n' -replace "`r", '\r' -replace "`t", '\t' -replace "`v", '\v'
+            $escaped = $InputObject `
+                -replace '\\', '\\' `
+                -replace '"', '\"' `
+                -replace "`0", '\0' `
+                -replace "`a", '\a' `
+                -replace "`b", '\b' `
+                -replace "`f", '\f' `
+                -replace "`n", '\n' `
+                -replace "`r", '\r' `
+                -replace "`t", '\t' `
+                -replace "`v", '\v'
             return "`"$escaped`""
         }
 
         # Depth check for complex types
         if ($CurrentDepth -ge $MaxDepth) {
-            Write-Warning "Depth limit ($MaxDepth) exceeded at depth $CurrentDepth. Serializing remaining object as string."
-            $str = $InputObject.ToString() -replace '\\', '\\\\' -replace '"', '\"'
+            Write-Warning "Depth limit ($MaxDepth) exceeded. Serializing remaining object as string."
+            $str = $InputObject.ToString() `
+                -replace '\\', '\\\\' `
+                -replace '"', '\"'
             return "`"$str`""
         }
 
@@ -95,7 +107,14 @@
             }
             $items = [System.Collections.Generic.List[string]]::new()
             foreach ($item in $InputObject) {
-                $value = ConvertTo-LuaTable -InputObject $item -CurrentDepth ($CurrentDepth + 1) -MaxDepth $MaxDepth -Compress:$Compress -EnumsAsStrings:$EnumsAsStrings
+                $childParams = @{
+                    InputObject    = $item
+                    CurrentDepth   = $CurrentDepth + 1
+                    MaxDepth       = $MaxDepth
+                    Compress       = $Compress
+                    EnumsAsStrings = $EnumsAsStrings
+                }
+                $value = ConvertTo-LuaTable @childParams
                 $items.Add("$childIndent$value")
             }
             return "{$newline$($items -join $separator)$newline$indent}"
@@ -113,7 +132,11 @@
                 if ($null -eq $val) {
                     continue
                 }
-                $value = ConvertTo-LuaTable -InputObject $val -CurrentDepth ($CurrentDepth + 1) -MaxDepth $MaxDepth -Compress:$Compress -EnumsAsStrings:$EnumsAsStrings
+                $value = ConvertTo-LuaTable -InputObject $val `
+                    -CurrentDepth ($CurrentDepth + 1) `
+                    -MaxDepth $MaxDepth `
+                    -Compress:$Compress `
+                    -EnumsAsStrings:$EnumsAsStrings
                 $luaKey = Format-LuaKey -Key ([string]$key)
                 $space = if ($Compress) { '' } else { ' ' }
                 $entries.Add("$childIndent$luaKey$space=${space}$value")
@@ -136,7 +159,11 @@
                 if ($null -eq $prop.Value) {
                     continue
                 }
-                $value = ConvertTo-LuaTable -InputObject $prop.Value -CurrentDepth ($CurrentDepth + 1) -MaxDepth $MaxDepth -Compress:$Compress -EnumsAsStrings:$EnumsAsStrings
+                $value = ConvertTo-LuaTable -InputObject $prop.Value `
+                    -CurrentDepth ($CurrentDepth + 1) `
+                    -MaxDepth $MaxDepth `
+                    -Compress:$Compress `
+                    -EnumsAsStrings:$EnumsAsStrings
                 $luaKey = Format-LuaKey -Key $prop.Name
                 $space = if ($Compress) { '' } else { ' ' }
                 $entries.Add("$childIndent$luaKey$space=${space}$value")

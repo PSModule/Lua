@@ -14,12 +14,17 @@
           {
             "id": 1,
             "name": "item1",
-            "tags": ["alpha", "beta"]
+            "tags": [
+              "alpha",
+              "beta"
+            ]
           },
           {
             "id": 2,
             "name": "item2",
-            "tags": ["gamma"]
+            "tags": [
+              "gamma"
+            ]
           }
         ]
       },
@@ -76,16 +81,32 @@
     }
   },
   "matrix": [
-    [1, 2, 3],
-    [4, 5, 6],
-    [7, 8, 9]
+    [
+      1,
+      2,
+      3
+    ],
+    [
+      4,
+      5,
+      6
+    ],
+    [
+      7,
+      8,
+      9
+    ]
   ],
   "mixedDepth": {
     "shallow": "yes",
     "deep": {
       "deeper": {
         "deepest": {
-          "array": [10, 20, 30],
+          "array": [
+            10,
+            20,
+            30
+          ],
           "nested": {
             "flag": false,
             "label": "end"
