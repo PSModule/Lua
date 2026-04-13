@@ -1005,11 +1005,11 @@ Describe 'Round-trip conversion' {
     Context 'Complex deep structure round-trips' {
         It 'Round-trips a full config-like structure (5+ levels)' {
             $original = [ordered]@{
-                app = [ordered]@{
+                app      = [ordered]@{
                     name    = 'MyApp'
                     version = '2.0'
                     modules = [ordered]@{
-                        auth = [ordered]@{
+                        auth    = [ordered]@{
                             enabled  = $true
                             provider = [ordered]@{
                                 type     = 'oauth'
