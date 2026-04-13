@@ -106,7 +106,7 @@
                 $numStr.Substring(2)
             }
             $longVal = [Convert]::ToInt64($hexPart, 16)
-            if ($isNegative) { $longVal = -$longVal }
+            if ($isNegative) { $longVal = (-$longVal) }
             if ($longVal -ge [int]::MinValue -and
                 $longVal -le [int]::MaxValue) {
                 return [int]$longVal

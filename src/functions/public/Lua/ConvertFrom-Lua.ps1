@@ -58,6 +58,7 @@
         https://www.lua.org/manual/5.4/manual.html#3.4.9
     #>
     [OutputType([object])]
+    [OutputType([System.Array])]
     [CmdletBinding()]
     param(
         # The Lua table constructor string to convert to a PowerShell object.

@@ -48,7 +48,7 @@
         }
 
         $result = ($intPart + $fracValue) * [Math]::Pow(2, $exponent)
-        if ($isNegative) { $result = -$result }
+        if ($isNegative) { $result = (-$result) }
         return $result
     }
 

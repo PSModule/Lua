@@ -48,8 +48,8 @@
         # Number or negative number
         if ($char -match '[0-9]' -or
             ($char -eq '-' -and
-                $script:luaPos + 1 -lt $script:luaString.Length -and
-                $script:luaString[$script:luaPos + 1] -match '[0-9.]')) {
+            $script:luaPos + 1 -lt $script:luaString.Length -and
+            $script:luaString[$script:luaPos + 1] -match '[0-9.]')) {
             return Read-LuaNumber
         }
 
