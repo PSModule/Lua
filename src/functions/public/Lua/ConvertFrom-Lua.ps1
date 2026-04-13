@@ -1,16 +1,15 @@
 ﻿function ConvertFrom-Lua {
     <#
         .SYNOPSIS
-        Converts a Lua table string to a PowerShell object.
+        Converts a Lua table constructor string to a PowerShell object.
 
         .DESCRIPTION
-        Takes a Lua table string and parses it into PowerShell objects. Lua tables with
-        string keys become ordered hashtables (or PSCustomObjects with -AsObject), Lua
-        sequences become arrays, and Lua primitives are converted to their PowerShell
-        equivalents.
+        Takes a Lua table constructor string and parses it into PowerShell objects.
+        By default, Lua tables with string keys become PSCustomObjects and Lua
+        sequences become arrays. Use -AsHashtable to get ordered hashtables instead.
 
         Supports the following Lua to PowerShell type mappings:
-        - Lua table (key = value)     -> [ordered] hashtable or [PSCustomObject]
+        - Lua table (key = value)     -> [PSCustomObject] or [ordered] hashtable
         - Lua sequence (array)        -> [object[]]
         - Lua double-quoted string    -> [string]
         - Lua single-quoted string    -> [string]
@@ -26,10 +25,9 @@
         ```powershell
         '{ name = "Alice", age = 30 }' | ConvertFrom-Lua
 
-        Name                           Value
-        ----                           -----
-        name                           Alice
-        age                            30
+        name  age
+        ----  ---
+        Alice  30
         ```
 
         .EXAMPLE
@@ -43,39 +41,52 @@
 
         .EXAMPLE
         ```powershell
-        '{ server = "localhost", port = 8080, enabled = true }' | ConvertFrom-Lua -AsObject
+        '{ name = "Alice" }' | ConvertFrom-Lua -AsHashtable
 
-        server    port enabled
-        ------    ---- -------
-        localhost 8080    True
+        Name                           Value
+        ----                           -----
+        name                           Alice
         ```
 
         .NOTES
-        [Lua Table Documentation](https://www.lua.org/pil/2.5.html)
+        [Lua 5.4 Reference Manual - Table Constructors](https://www.lua.org/manual/5.4/manual.html#3.4.9)
 
         .LINK
         https://psmodule.io/Lua/Functions/ConvertFrom-Lua/
 
         .LINK
-        https://www.lua.org/pil/2.5.html
+        https://www.lua.org/manual/5.4/manual.html#3.4.9
     #>
     [OutputType([object])]
     [CmdletBinding()]
     param(
-        # The Lua table string to convert to a PowerShell object.
-        [Parameter(Mandatory, ValueFromPipeline)]
+        # The Lua table constructor string to convert to a PowerShell object.
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
         [ValidateNotNullOrEmpty()]
         [string] $InputObject,
 
-        # Output PSCustomObjects instead of hashtables for Lua tables with string keys.
+        # Output ordered hashtables instead of PSCustomObjects for Lua tables with string keys.
         [Parameter()]
-        [switch] $AsObject
+        [switch] $AsHashtable,
+
+        # Max nesting depth allowed in input. Throws a terminating error when exceeded.
+        [Parameter()]
+        [int] $Depth = 1024,
+
+        # Output arrays as a single object instead of enumerating elements through the pipeline.
+        [Parameter()]
+        [switch] $NoEnumerate
     )
 
     begin {}
 
     process {
-        ConvertFrom-LuaTable -InputString $InputObject -AsPSCustomObject:$AsObject
+        $result = ConvertFrom-LuaTable -InputString $InputObject -AsPSCustomObject:(-not $AsHashtable) -MaxDepth $Depth
+        if ($NoEnumerate) {
+            Write-Output -NoEnumerate $result
+        } else {
+            $result
+        }
     }
 
     end {}

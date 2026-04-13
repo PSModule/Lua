@@ -4,8 +4,8 @@
         Formats a string as a valid Lua table key.
 
         .DESCRIPTION
-        Returns the key as a bare identifier if it matches Lua identifier rules,
-        otherwise wraps it in bracket-quote notation: ["key"].
+        Returns the key as a bare identifier if it matches Lua identifier rules
+        and is not a reserved word, otherwise wraps it in bracket-quote notation: ["key"].
     #>
     [OutputType([string])]
     [CmdletBinding()]
@@ -15,10 +15,18 @@
         [string] $Key
     )
 
-    begin {}
+    begin {
+        # Lua 5.4 reserved words per §3.1
+        $reservedWords = @(
+            'and', 'break', 'do', 'else', 'elseif', 'end',
+            'false', 'for', 'function', 'goto', 'if', 'in',
+            'local', 'nil', 'not', 'or', 'repeat', 'return',
+            'then', 'true', 'until', 'while'
+        )
+    }
 
     process {
-        if ($Key -match '^[a-zA-Z_][a-zA-Z0-9_]*$') {
+        if ($Key -match '^[a-zA-Z_][a-zA-Z0-9_]*$' -and $Key -notin $reservedWords) {
             return $Key
         }
         $escaped = $Key -replace '\\', '\\\\' -replace '"', '\"'

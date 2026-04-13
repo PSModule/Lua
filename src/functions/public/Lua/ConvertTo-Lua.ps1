@@ -1,21 +1,22 @@
 ﻿function ConvertTo-Lua {
     <#
         .SYNOPSIS
-        Converts a PowerShell object to a Lua table string.
+        Converts a PowerShell object to a Lua table constructor string.
 
         .DESCRIPTION
         Takes a PowerShell object (hashtable, PSCustomObject, array, or primitive value) and
-        converts it to a Lua table string representation. Nested structures are recursively
-        converted with proper indentation.
+        converts it to a Lua table constructor string representation. Nested structures are
+        recursively converted with 4-space indentation.
 
         Supports the following type mappings:
         - [hashtable] / [ordered] -> Lua table with key = value pairs
         - [PSCustomObject]        -> Lua table with key = value pairs
         - [array]                 -> Lua table (sequence)
         - [string]                -> Lua double-quoted string with escape sequences
-        - [int] / [long] / [double] / [decimal] -> Lua number
+        - [int] / [long]          -> Lua integer
+        - [float] / [double]      -> Lua float
         - [bool]                  -> Lua boolean (true/false)
-        - $null                   -> nil
+        - $null                   -> omitted (nil means absent in Lua)
 
         .EXAMPLE
         ```powershell
@@ -36,46 +37,56 @@
 
         .EXAMPLE
         ```powershell
-        [PSCustomObject]@{ server = "localhost"; port = 8080; enabled = $true } | ConvertTo-Lua
+        "hello" | ConvertTo-Lua -AsArray
 
         {
-            server = "localhost",
-            port = 8080,
-            enabled = true
+            "hello"
         }
         ```
 
         .NOTES
-        [Lua Table Documentation](https://www.lua.org/pil/2.5.html)
+        [Lua 5.4 Reference Manual - Table Constructors](https://www.lua.org/manual/5.4/manual.html#3.4.9)
 
         .LINK
         https://psmodule.io/Lua/Functions/ConvertTo-Lua/
 
         .LINK
-        https://www.lua.org/pil/2.5.html
+        https://www.lua.org/manual/5.4/manual.html#3.4.9
     #>
     [OutputType([string])]
     [CmdletBinding()]
     param(
-        # The object to convert to a Lua table string.
-        [Parameter(Mandatory, ValueFromPipeline)]
+        # The object to convert to a Lua table constructor string.
+        [Parameter(Mandatory, Position = 0, ValueFromPipeline)]
         [AllowNull()]
         [object] $InputObject,
 
-        # Number of spaces per indentation level.
+        # Max recursion depth for nested object serialization. Emits a warning when exceeded.
         [Parameter()]
-        [ValidateRange(1, 16)]
-        [int] $Depth = 4,
+        [ValidateRange(0, 100)]
+        [int] $Depth = 2,
 
-        # Whether to compress the output by removing whitespace and newlines.
+        # Omit whitespace and indentation.
         [Parameter()]
-        [switch] $Compress
+        [switch] $Compress,
+
+        # Serialize PowerShell enum values as their string name instead of numeric value.
+        [Parameter()]
+        [switch] $EnumsAsStrings,
+
+        # Always wrap output in a Lua sequence table, even for a single value.
+        [Parameter()]
+        [switch] $AsArray
     )
 
     begin {}
 
     process {
-        ConvertTo-LuaTable -InputObject $InputObject -Depth 0 -IndentSize $Depth -Compress:$Compress
+        $objectToConvert = $InputObject
+        if ($AsArray -and $InputObject -isnot [System.Collections.IList]) {
+            $objectToConvert = @(, $InputObject)
+        }
+        ConvertTo-LuaTable -InputObject $objectToConvert -CurrentDepth 0 -MaxDepth $Depth -Compress:$Compress -EnumsAsStrings:$EnumsAsStrings
     }
 
     end {}
