@@ -377,11 +377,94 @@ Describe 'ConvertFrom-Lua' {
         }
     }
 
-    Context 'Error cases' {
-        It 'Throws on bare identifier (variable reference)' {
-            { ConvertFrom-Lua -InputObject 'someVariable' } | Should -Throw '*bare identifier*'
+    Context 'Assignment statements' {
+        It 'Parses a single assignment statement' {
+            $lua = 'MyDB = { name = "test", count = 42 }'
+            $result = ConvertFrom-Lua -InputObject $lua
+            $result.MyDB.name | Should -Be 'test'
+            $result.MyDB.count | Should -Be 42
         }
 
+        It 'Parses multiple assignment statements' {
+            $lua = @'
+DB1 = { x = 1 }
+DB2 = { y = 2 }
+'@
+            $result = ConvertFrom-Lua -InputObject $lua
+            $result.DB1.x | Should -Be 1
+            $result.DB2.y | Should -Be 2
+        }
+
+        It 'Parses assignment with string value' {
+            $lua = 'myVar = "hello"'
+            $result = ConvertFrom-Lua -InputObject $lua
+            $result.myVar | Should -Be 'hello'
+        }
+
+        It 'Parses assignment with array value' {
+            $lua = 'myArr = { 1, 2, 3 }'
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.myArr.Count | Should -Be 3
+            $result.myArr[0] | Should -Be 1
+        }
+
+        It 'Parses assignment with boolean value' {
+            $lua = 'flag = true'
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.flag | Should -BeTrue
+        }
+
+        It 'Parses assignment with nil value' {
+            $lua = 'empty = nil'
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.empty | Should -BeNullOrEmpty
+        }
+
+        It 'Parses assignment returning PSCustomObject by default' {
+            $lua = 'X = { a = 1 }'
+            $result = ConvertFrom-Lua -InputObject $lua
+            $result | Should -BeOfType [PSCustomObject]
+            $result.X.a | Should -Be 1
+        }
+
+        It 'Parses assignment returning ordered hashtable with -AsHashtable' {
+            $lua = 'X = { a = 1 }'
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result | Should -BeOfType [System.Collections.Specialized.OrderedDictionary]
+            $result.X.a | Should -Be 1
+        }
+
+        It 'Handles comments between assignments' {
+            $lua = @'
+-- First variable
+A = { val = 1 }
+-- Second variable
+B = { val = 2 }
+'@
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.A.val | Should -Be 1
+            $result.B.val | Should -Be 2
+        }
+
+        It 'Handles variable names with underscores' {
+            $lua = 'My_Addon_DB = { enabled = true }'
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.My_Addon_DB.enabled | Should -BeTrue
+        }
+
+        It 'Does not treat true/false/nil as assignments' {
+            $result = ConvertFrom-Lua -InputObject 'true'
+            $result | Should -BeTrue
+
+            $result = ConvertFrom-Lua -InputObject 'false'
+            $result | Should -BeFalse
+
+            $result = ConvertFrom-Lua -InputObject 'nil'
+            $result | Should -BeNullOrEmpty
+        }
+    }
+
+    Context 'Error cases' {
         It 'Throws on bare identifier inside table' {
             { ConvertFrom-Lua -InputObject '{ myVar }' } | Should -Throw '*bare identifier*'
         }
@@ -594,6 +677,46 @@ Describe 'ConvertFrom-Lua' {
             $result.mixedDepth.deep.deeper.deepest.array[0] | Should -Be 10
             $result.mixedDepth.deep.deeper.deepest.nested.flag | Should -BeFalse
             $result.mixedDepth.deep.deeper.deepest.nested.label | Should -Be 'end'
+        }
+    }
+
+    Context 'File-based test: Assignments (SavedVariables style)' {
+        BeforeAll {
+            $luaContent = Get-Content -Path (Join-Path $dataPath 'Assignments.lua') -Raw
+            $expected = Get-Content -Path (Join-Path $dataPath 'Assignments.json') -Raw | ConvertFrom-Json
+        }
+
+        It 'Parses multiple top-level variable assignments' {
+            $result = ConvertFrom-Lua -InputObject $luaContent
+            $result.MyAddonDB | Should -Not -BeNullOrEmpty
+            $result.MyAddonOptions | Should -Not -BeNullOrEmpty
+        }
+
+        It 'Parses first assignment values correctly' {
+            $result = ConvertFrom-Lua -InputObject $luaContent
+            $result.MyAddonDB.enabled | Should -Be $expected.MyAddonDB.enabled
+            $result.MyAddonDB.fontSize | Should -Be $expected.MyAddonDB.fontSize
+            $result.MyAddonDB.name | Should -Be $expected.MyAddonDB.name
+        }
+
+        It 'Parses second assignment values correctly' {
+            $result = ConvertFrom-Lua -InputObject $luaContent
+            $result.MyAddonOptions.showTooltips | Should -Be $expected.MyAddonOptions.showTooltips
+            $result.MyAddonOptions.scale | Should -Be $expected.MyAddonOptions.scale
+        }
+
+        It 'Parses nested array in assignment' {
+            $result = ConvertFrom-Lua -InputObject $luaContent
+            $result.MyAddonOptions.colors.Count | Should -Be 3
+            $result.MyAddonOptions.colors[0] | Should -Be $expected.MyAddonOptions.colors[0]
+        }
+
+        It 'Returns ordered hashtable with -AsHashtable' {
+            $result = ConvertFrom-Lua -InputObject $luaContent -AsHashtable
+            $result | Should -BeOfType [System.Collections.Specialized.OrderedDictionary]
+            $keys = @($result.Keys)
+            $keys[0] | Should -Be 'MyAddonDB'
+            $keys[1] | Should -Be 'MyAddonOptions'
         }
     }
 }

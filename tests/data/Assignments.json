@@ -1,0 +1,12 @@
+{
+    "MyAddonDB": {
+        "enabled": true,
+        "fontSize": 14,
+        "name": "TestAddon"
+    },
+    "MyAddonOptions": {
+        "showTooltips": false,
+        "scale": 0.85,
+        "colors": [0.5, 0.8, 1.0]
+    }
+}

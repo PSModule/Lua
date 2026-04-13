@@ -1,0 +1,91 @@
+WildDB = {
+	["tooltip"] = {
+		["enabled"] = true,
+		["lines"] = {
+			["itemID"] = "always",
+			["sellPrice"] = "settings",
+			["quality"] = "settings",
+			["itemLevel"] = "settings",
+			["bindType"] = "settings",
+		},
+	},
+	["vendorSellRules"] = {
+	},
+	["lootAutoLoot"] = true,
+	["screenCenterCircle"] = true,
+	["screenCenterCircleSize"] = 48,
+	["screenCenterCircleThickness"] = 5,
+	["lfg"] = {
+		["autoAcceptQueue"] = false,
+		["autoConfirmRole"] = true,
+		["autoAcceptRoleCheck"] = true,
+		["quickApply"] = true,
+		["keystoneButtons"] = true,
+		["filters"] = {
+			["enabled"] = false,
+			["hideDelisted"] = true,
+			["maxMembers"] = 0,
+			["hideIneligible"] = false,
+			["hidePvP"] = false,
+			["minMembers"] = 0,
+		},
+	},
+	["craftingOrders"] = {
+		["enabled"] = true,
+		["maxLevel"] = 0,
+		["currentExpansionOnly"] = true,
+		["minLevel"] = 0,
+		["filters"] = {
+			[3] = true,
+			[6] = false,
+			[7] = true,
+			[8] = true,
+		},
+	},
+	["datastore"] = {
+		["characters"] = {
+			["Clawe-Tarren Mill"] = {
+				["bags"] = {
+					{
+						["name"] = "Hearthstone",
+						["itemID"] = 6948,
+						["count"] = 1,
+						["isBound"] = true,
+						["quality"] = 1,
+						["bag"] = 0,
+						["slot"] = 1,
+					},
+					{
+						["name"] = "Mythic Keystone",
+						["itemID"] = 180653,
+						["count"] = 1,
+						["isBound"] = true,
+						["quality"] = 4,
+						["bag"] = 1,
+						["slot"] = 2,
+					},
+				},
+				["bagsUpdated"] = 1776093709,
+				["bankUpdated"] = 1776093705,
+			},
+		},
+	},
+	["eventTrace"] = {
+		"[1049155.942] GUILD_ROSTER_UPDATE | false",
+		"[1049156.293] LFG_LIST_SEARCH_RESULT_UPDATED | 1404",
+		"[1049156.678] COMPANION_UPDATE | MOUNT",
+	},
+}
+WildDBOptions = {
+	["profileKeys"] = {
+		["Clawe - Tarren Mill"] = "Default",
+		["Lucretius - Tarren Mill"] = "Default",
+	},
+	["profiles"] = {
+		["Default"] = {
+			["minimap"] = {
+				["hide"] = false,
+			},
+		},
+	},
+}
