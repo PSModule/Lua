@@ -73,6 +73,9 @@
                             $hexStr = $script:luaString.Substring(
                                 $script:luaPos, 2
                             )
+                            if ($hexStr -notmatch '^[0-9a-fA-F]{2}$') {
+                                throw 'Invalid \x escape sequence: expected two hexadecimal digits.'
+                            }
                             $hexVal = [Convert]::ToInt32($hexStr, 16)
                             $null = $result.Append([char]$hexVal)
                             $script:luaPos += 2
@@ -90,6 +93,9 @@
                             while ($script:luaPos -lt $script:luaString.Length -and
                                 $script:luaString[$script:luaPos] -ne '}') {
                                 $script:luaPos++
+                            }
+                            if ($script:luaPos -ge $script:luaString.Length) {
+                                throw 'Invalid \u escape sequence: missing closing brace.'
                             }
                             $hexStr = $script:luaString.Substring(
                                 $hexStart,

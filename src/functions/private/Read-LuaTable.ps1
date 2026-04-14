@@ -44,6 +44,9 @@
                 $script:luaPos++ # skip [
                 Skip-LuaWhitespace
                 $key = Read-LuaValue
+                if ($null -eq $key) {
+                    throw 'Lua table keys cannot be nil.'
+                }
                 Skip-LuaWhitespace
                 if ($script:luaPos -ge $script:luaString.Length -or
                     $script:luaString[$script:luaPos] -ne ']') {
