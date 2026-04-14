@@ -61,7 +61,14 @@
                 $escaped = $InputObject.ToString() -replace '\\', '\\\\' -replace '"', '\"'
                 return "`"$escaped`""
             }
-            return ([int]$InputObject).ToString([System.Globalization.CultureInfo]::InvariantCulture)
+            $underlyingType = [System.Enum]::GetUnderlyingType($InputObject.GetType())
+            if ($underlyingType -eq [byte] -or
+                $underlyingType -eq [uint16] -or
+                $underlyingType -eq [uint32] -or
+                $underlyingType -eq [uint64]) {
+                return ([System.Convert]::ToUInt64($InputObject)).ToString([System.Globalization.CultureInfo]::InvariantCulture)
+            }
+            return ([System.Convert]::ToInt64($InputObject)).ToString([System.Globalization.CultureInfo]::InvariantCulture)
         }
 
         if ($InputObject -is [int] -or $InputObject -is [long] -or

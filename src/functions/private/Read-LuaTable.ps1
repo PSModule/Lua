@@ -36,9 +36,11 @@
             }
 
             # Check for bracket key: ["key"] = value or [expr] = value
+            # When [ is followed by [ or =, it's a long-bracket string value, not a bracket key
             if ($script:luaString[$script:luaPos] -eq '[' -and
                 $script:luaPos + 1 -lt $script:luaString.Length -and
-                $script:luaString[$script:luaPos + 1] -ne '[') {
+                $script:luaString[$script:luaPos + 1] -ne '[' -and
+                $script:luaString[$script:luaPos + 1] -ne '=') {
                 $script:luaPos++ # skip [
                 Skip-LuaWhitespace
                 $key = Read-LuaValue

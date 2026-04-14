@@ -9,6 +9,7 @@
         engine used by ConvertFrom-Lua.
     #>
     [OutputType([object])]
+    [OutputType([System.Collections.Specialized.OrderedDictionary])]
     [CmdletBinding()]
     param(
         # The Lua table string to parse.
@@ -40,7 +41,7 @@
             $script:luaString.Substring($script:luaPos, 6) -ceq 'return') {
             $nextPos = $script:luaPos + 6
             if ($nextPos -ge $script:luaString.Length -or
-                $script:luaString[$nextPos] -match '[\s{]') {
+                $script:luaString[$nextPos] -notmatch '[a-zA-Z0-9_]') {
                 $script:luaPos = $nextPos
                 Skip-LuaWhitespace
             }
