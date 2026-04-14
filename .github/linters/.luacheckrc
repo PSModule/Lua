@@ -1,2 +1,4 @@
-files["tests/data/Assignments.lua"].allow_defined_top = true
-files["tests/data/WoWSavedVariables.lua"].allow_defined_top = true
+-- Test data files are Lua data/config files (e.g. WoW SavedVariables format)
+-- that define top-level globals and are not executed as scripts.
+files["**/tests/data/Assignments.lua"].ignore = {""}
+files["**/tests/data/WoWSavedVariables.lua"].ignore = {""}
