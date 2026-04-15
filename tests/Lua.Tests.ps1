@@ -922,6 +922,15 @@ Describe 'ConvertTo-Lua' {
             $warnings = @($result | Where-Object { $_ -is [System.Management.Automation.WarningRecord] })
             $warnings.Count | Should -BeGreaterThan 0
         }
+
+        It 'Escapes control characters in depth-limit fallback string' {
+            $inner = [System.Text.StringBuilder]::new("line1`nline2`ttab")
+            $obj = [ordered]@{ x = $inner }
+            $result = ConvertTo-Lua -InputObject $obj -Depth 1 -Compress 3>&1
+            $output = @($result | Where-Object { $_ -is [string] })
+            $output[-1] | Should -BeLike '*\n*'
+            $output[-1] | Should -BeLike '*\t*'
+        }
     }
 
     Context 'AsArray' {
@@ -1000,6 +1009,12 @@ Describe 'ConvertTo-Lua' {
             $result = ConvertTo-Lua -InputObject $guid -Compress
             $result | Should -Not -Be '{}'
             $result | Should -Match '^".*"$'
+        }
+
+        It 'Escapes control characters in generic fallback string' {
+            $sb = [System.Text.StringBuilder]::new("line1`nline2`ttab")
+            $result = ConvertTo-Lua -InputObject $sb -Compress
+            $result | Should -Be '"line1\nline2\ttab"'
         }
     }
 }

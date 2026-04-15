@@ -116,8 +116,16 @@
         if ($CurrentDepth -ge $MaxDepth) {
             Write-Warning "Depth limit ($MaxDepth) exceeded. Serializing remaining object as string."
             $str = $InputObject.ToString() `
-                -replace '\\', '\\\\' `
-                -replace '"', '\"'
+                -replace '\\', '\\' `
+                -replace '"', '\"' `
+                -replace "`0", '\0' `
+                -replace "`a", '\a' `
+                -replace "`b", '\b' `
+                -replace "`f", '\f' `
+                -replace "`n", '\n' `
+                -replace "`r", '\r' `
+                -replace "`t", '\t' `
+                -replace "`v", '\v'
             return "`"$str`""
         }
 
@@ -195,7 +203,17 @@
         }
 
         # Fallback: convert to string
-        $escaped = ($InputObject.ToString()) -replace '\\', '\\\\' -replace '"', '\"'
+        $escaped = $InputObject.ToString() `
+            -replace '\\', '\\' `
+            -replace '"', '\"' `
+            -replace "`0", '\0' `
+            -replace "`a", '\a' `
+            -replace "`b", '\b' `
+            -replace "`f", '\f' `
+            -replace "`n", '\n' `
+            -replace "`r", '\r' `
+            -replace "`t", '\t' `
+            -replace "`v", '\v'
         return "`"$escaped`""
     }
 
