@@ -499,6 +499,14 @@ B = { val = 2 }
         It 'Throws on unterminated table (missing closing brace)' {
             { ConvertFrom-Lua -InputObject '{ a = 1' } | Should -Throw '*Unterminated*'
         }
+
+        It 'Throws on whitespace-only input' {
+            { ConvertFrom-Lua -InputObject '   ' } | Should -Throw '*Unexpected end of input*'
+        }
+
+        It 'Throws on assignment with missing value' {
+            { ConvertFrom-Lua -InputObject 'A = ' } | Should -Throw '*Unexpected end of input*'
+        }
     }
 
     Context 'Pipeline input' {

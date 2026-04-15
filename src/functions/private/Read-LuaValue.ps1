@@ -18,7 +18,7 @@
         Skip-LuaWhitespace
 
         if ($script:luaPos -ge $script:luaString.Length) {
-            return $null
+            throw 'Unexpected end of input'
         }
 
         $char = $script:luaString[$script:luaPos]
