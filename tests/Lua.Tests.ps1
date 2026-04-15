@@ -55,7 +55,7 @@ Describe 'ConvertFrom-Lua' {
 
         It 'Converts Lua nil to PowerShell $null' {
             $result = ConvertFrom-Lua -InputObject 'nil'
-            $result | Should -BeNullOrEmpty
+            $result | Should -Be $null
         }
     }
 
@@ -417,7 +417,7 @@ DB2 = { y = 2 }
         It 'Parses assignment with nil value' {
             $lua = 'empty = nil'
             $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
-            $result.empty | Should -BeNullOrEmpty
+            $result.empty | Should -Be $null
         }
 
         It 'Parses assignment returning PSCustomObject by default' {
@@ -479,7 +479,7 @@ B = { val = 2 }
             $result | Should -BeFalse
 
             $result = ConvertFrom-Lua -InputObject 'nil'
-            $result | Should -BeNullOrEmpty
+            $result | Should -Be $null
         }
     }
 
