@@ -16,7 +16,7 @@
         - [int] / [long]          -> Lua integer
         - [float] / [double]      -> Lua float
         - [bool]                  -> Lua boolean (true/false)
-        - $null                   -> omitted (nil means absent in Lua)
+        - $null                   -> top-level input serializes as nil; null-valued properties/keys are omitted
 
         .EXAMPLE
         ```powershell

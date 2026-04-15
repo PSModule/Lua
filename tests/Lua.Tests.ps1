@@ -973,6 +973,35 @@ Describe 'ConvertTo-Lua' {
             $result | Should -Be '{x=10}'
         }
     }
+
+    Context 'Non-finite float values' {
+        It 'Throws on NaN double' {
+            { ConvertTo-Lua -InputObject ([double]::NaN) } | Should -Throw '*NaN*'
+        }
+
+        It 'Throws on Infinity double' {
+            { ConvertTo-Lua -InputObject ([double]::PositiveInfinity) } | Should -Throw '*Infinity*'
+        }
+
+        It 'Throws on negative Infinity double' {
+            { ConvertTo-Lua -InputObject ([double]::NegativeInfinity) } | Should -Throw '*Infinity*'
+        }
+    }
+
+    Context '.NET object string fallback' {
+        It 'Serializes DateTime as string instead of empty table' {
+            $result = ConvertTo-Lua -InputObject ([datetime]'2026-01-01') -Compress
+            $result | Should -Not -Be '{}'
+            $result | Should -Match '^".*"$'
+        }
+
+        It 'Serializes Guid as string instead of empty table' {
+            $guid = [guid]::NewGuid()
+            $result = ConvertTo-Lua -InputObject $guid -Compress
+            $result | Should -Not -Be '{}'
+            $result | Should -Match '^".*"$'
+        }
+    }
 }
 
 Describe 'Round-trip conversion' {

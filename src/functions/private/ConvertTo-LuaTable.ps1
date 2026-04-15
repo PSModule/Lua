@@ -79,8 +79,21 @@
             return $InputObject.ToString([System.Globalization.CultureInfo]::InvariantCulture)
         }
 
-        if ($InputObject -is [float] -or $InputObject -is [double] -or
-            $InputObject -is [decimal] -or $InputObject -is [single]) {
+        if ($InputObject -is [double]) {
+            if ([double]::IsNaN($InputObject) -or [double]::IsInfinity($InputObject)) {
+                throw "Cannot serialize non-finite double value '$InputObject' to Lua. Lua numeric literals do not support NaN or Infinity."
+            }
+            return $InputObject.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+        }
+
+        if ($InputObject -is [float] -or $InputObject -is [single]) {
+            if ([single]::IsNaN($InputObject) -or [single]::IsInfinity($InputObject)) {
+                throw "Cannot serialize non-finite single value '$InputObject' to Lua. Lua numeric literals do not support NaN or Infinity."
+            }
+            return $InputObject.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+        }
+
+        if ($InputObject -is [decimal]) {
             return $InputObject.ToString([System.Globalization.CultureInfo]::InvariantCulture)
         }
 
@@ -155,7 +168,7 @@
         }
 
         # Handle PSCustomObject
-        if ($InputObject -is [psobject]) {
+        if ($InputObject -is [System.Management.Automation.PSCustomObject]) {
             $properties = $InputObject.PSObject.Properties | Where-Object { $_.MemberType -eq 'NoteProperty' }
             if (-not $properties) {
                 return '{}'
