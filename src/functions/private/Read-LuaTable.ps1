@@ -122,6 +122,9 @@
         if ($script:luaPos -lt $script:luaString.Length -and
             $script:luaString[$script:luaPos] -eq '}') {
             $script:luaPos++ # skip }
+        } else {
+            $script:luaCurrentDepth--
+            throw "Unterminated Lua table constructor. Expected '}' before end of input."
         }
 
         $script:luaCurrentDepth--

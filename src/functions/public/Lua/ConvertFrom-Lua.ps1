@@ -85,7 +85,7 @@
     process {
         $result = ConvertFrom-LuaTable -InputString $InputObject -AsPSCustomObject:(-not $AsHashtable) -MaxDepth $Depth
         if ($NoEnumerate -and $result -is [System.Array]) {
-            Write-Output -NoEnumerate $result
+            Write-Output -InputObject $result -NoEnumerate
         } else {
             $result
         }

@@ -476,6 +476,10 @@ B = { val = 2 }
         It 'Throws on unterminated multi-line string' {
             { ConvertFrom-Lua -InputObject '[[hello' } | Should -Throw '*Unterminated*'
         }
+
+        It 'Throws on unterminated table (missing closing brace)' {
+            { ConvertFrom-Lua -InputObject '{ a = 1' } | Should -Throw '*Unterminated*'
+        }
     }
 
     Context 'Pipeline input' {
@@ -878,6 +882,12 @@ Describe 'ConvertTo-Lua' {
         It 'Uses bracket notation for "while" as a key' {
             $result = ConvertTo-Lua -InputObject @{ 'while' = 'loop' } -Compress
             $result | Should -Be '{["while"]="loop"}'
+        }
+
+        It 'Escapes control characters in bracket-quoted keys' {
+            $key = "line1`nline2"
+            $result = ConvertTo-Lua -InputObject @{ $key = 'value' } -Compress
+            $result | Should -Be '{["line1\nline2"]="value"}'
         }
     }
 

@@ -32,9 +32,12 @@
         $escaped = $Key `
             -replace '\\', '\\' `
             -replace '"', '\"' `
+            -replace "`0", '\0' `
+            -replace "`a", '\a' `
             -replace "`n", '\n' `
             -replace "`r", '\r' `
             -replace "`t", '\t' `
+            -replace "`v", '\v' `
             -replace "`b", '\b' `
             -replace "`f", '\f'
         return "[`"$escaped`"]"
