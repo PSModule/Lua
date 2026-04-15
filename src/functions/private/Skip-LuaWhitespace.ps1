@@ -50,7 +50,7 @@
                             $script:luaPos++
                         }
                         if (-not $foundClosingDelimiter) {
-                            throw "Unterminated long-bracket comment."
+                            throw 'Unterminated long-bracket comment.'
                         }
                     } else {
                         # Not a long bracket - treat as single-line comment
