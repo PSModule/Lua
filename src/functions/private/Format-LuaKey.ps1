@@ -30,7 +30,7 @@
             return $Key
         }
         $escaped = $Key `
-            -replace '\\', '\\\\' `
+            -replace '\\', '\\' `
             -replace '"', '\"' `
             -replace "`n", '\n' `
             -replace "`r", '\r' `
