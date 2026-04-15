@@ -9,17 +9,17 @@
         sequences become arrays. Use -AsHashtable to get ordered hashtables instead.
 
         Supports the following Lua to PowerShell type mappings:
-        - Lua table (key = value)     -> [PSCustomObject] or [ordered] hashtable
-        - Lua sequence (array)        -> [object[]]
-        - Lua double-quoted string    -> [string]
-        - Lua single-quoted string    -> [string]
-        - Lua multi-line string [[ ]] -> [string]
-        - Lua number (integer)        -> [int] or [long]
-        - Lua number (float)          -> [double]
-        - Lua boolean (true/false)    -> [bool]
-        - nil                         -> $null
-        - Single-line comments (--)   -> Ignored
-        - Multi-line comments (--[[ ]]) -> Ignored
+        - Lua table (key = value)                  -> [PSCustomObject] or [ordered] hashtable
+        - Lua sequence (array)                     -> [object[]]
+        - Lua double-quoted string                 -> [string]
+        - Lua single-quoted string                 -> [string]
+        - Lua multi-line string ([[ ]], [=[ ]=], [==[ ]==], etc.) -> [string]
+        - Lua number (integer)                     -> [int] or [long]
+        - Lua number (float)                       -> [double]
+        - Lua boolean (true/false)                 -> [bool]
+        - nil                                      -> $null
+        - Single-line comments (--)                -> Ignored
+        - Multi-line comments (--[[ ]], --[=[ ]=], --[==[ ]==], etc.) -> Ignored
 
         .EXAMPLE
         ```powershell

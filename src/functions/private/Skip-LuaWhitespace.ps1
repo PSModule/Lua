@@ -38,20 +38,11 @@
                         # Valid long bracket comment opening
                         $script:luaPos = $eqStart + $eqCount + 1
                         $closePattern = ']' + ('=' * $eqCount) + ']'
-                        $closeLen = $closePattern.Length
-                        $foundClosingDelimiter = $false
-                        while ($script:luaPos -lt $script:luaString.Length) {
-                            if ($script:luaPos + $closeLen - 1 -lt $script:luaString.Length -and
-                                $script:luaString.Substring($script:luaPos, $closeLen) -eq $closePattern) {
-                                $script:luaPos += $closeLen
-                                $foundClosingDelimiter = $true
-                                break
-                            }
-                            $script:luaPos++
-                        }
-                        if (-not $foundClosingDelimiter) {
+                        $closingIndex = $script:luaString.IndexOf($closePattern, $script:luaPos)
+                        if ($closingIndex -lt 0) {
                             throw 'Unterminated long-bracket comment.'
                         }
+                        $script:luaPos = $closingIndex + $closePattern.Length
                     } else {
                         # Not a long bracket - treat as single-line comment
                         while ($script:luaPos -lt $script:luaString.Length -and
