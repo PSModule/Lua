@@ -39,13 +39,18 @@
                         $script:luaPos = $eqStart + $eqCount + 1
                         $closePattern = ']' + ('=' * $eqCount) + ']'
                         $closeLen = $closePattern.Length
+                        $foundClosingDelimiter = $false
                         while ($script:luaPos -lt $script:luaString.Length) {
                             if ($script:luaPos + $closeLen - 1 -lt $script:luaString.Length -and
                                 $script:luaString.Substring($script:luaPos, $closeLen) -eq $closePattern) {
                                 $script:luaPos += $closeLen
+                                $foundClosingDelimiter = $true
                                 break
                             }
                             $script:luaPos++
+                        }
+                        if (-not $foundClosingDelimiter) {
+                            throw "Unterminated long-bracket comment."
                         }
                     } else {
                         # Not a long bracket - treat as single-line comment

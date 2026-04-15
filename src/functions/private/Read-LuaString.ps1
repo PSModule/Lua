@@ -153,7 +153,11 @@
                                     break
                                 }
                             }
-                            $null = $result.Append([char][int]$numStr)
+                            $byteValue = [int]$numStr
+                            if ($byteValue -gt 255) {
+                                throw "Invalid decimal escape sequence '\$numStr'. Lua decimal escapes must be in the range 0-255."
+                            }
+                            $null = $result.Append([char]$byteValue)
                         } else {
                             # Unknown escape - just pass through
                             $null = $result.Append($nextChar)

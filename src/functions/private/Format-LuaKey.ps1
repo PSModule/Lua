@@ -29,7 +29,14 @@
         if ($Key -match '^[a-zA-Z_][a-zA-Z0-9_]*$' -and $Key -notin $reservedWords) {
             return $Key
         }
-        $escaped = $Key -replace '\\', '\\\\' -replace '"', '\"'
+        $escaped = $Key `
+            -replace '\\', '\\\\' `
+            -replace '"', '\"' `
+            -replace "`n", '\n' `
+            -replace "`r", '\r' `
+            -replace "`t", '\t' `
+            -replace "`b", '\b' `
+            -replace "`f", '\f'
         return "[`"$escaped`"]"
     }
 
