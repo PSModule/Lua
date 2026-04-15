@@ -452,6 +452,25 @@ B = { val = 2 }
             $result.My_Addon_DB.enabled | Should -BeTrue
         }
 
+        It 'Parses semicolon-separated assignment statements' {
+            $lua = 'A = 1; B = 2; C = "three"'
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.A | Should -Be 1
+            $result.B | Should -Be 2
+            $result.C | Should -Be 'three'
+        }
+
+        It 'Parses assignments with comment between identifier and equals' {
+            $lua = @'
+A --[[ comment ]]
+= { val = 1 }
+B = { val = 2 }
+'@
+            $result = ConvertFrom-Lua -InputObject $lua -AsHashtable
+            $result.A.val | Should -Be 1
+            $result.B.val | Should -Be 2
+        }
+
         It 'Does not treat true/false/nil as assignments' {
             $result = ConvertFrom-Lua -InputObject 'true'
             $result | Should -BeTrue

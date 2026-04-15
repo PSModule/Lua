@@ -63,12 +63,13 @@
             $tryIdent = $script:luaString.Substring($script:luaPos, $tryPos - $script:luaPos)
             # Check it's not a keyword that starts a value (true/false/nil)
             if ($tryIdent -notin 'true', 'false', 'nil') {
-                # Skip whitespace after identifier to check for '='
-                $peekPos = $tryPos
-                while ($peekPos -lt $script:luaString.Length -and
-                    $script:luaString[$peekPos] -match '\s') {
-                    $peekPos++
-                }
+                # Skip whitespace and comments after identifier to check for '='
+                # Use Skip-LuaWhitespace with save/restore to handle comments
+                $peekSavedPos = $script:luaPos
+                $script:luaPos = $tryPos
+                Skip-LuaWhitespace
+                $peekPos = $script:luaPos
+                $script:luaPos = $peekSavedPos
                 # Check for '=' but not '=='
                 if ($peekPos -lt $script:luaString.Length -and
                     $script:luaString[$peekPos] -eq '=' -and
@@ -112,7 +113,13 @@
                 $value = Read-LuaValue
                 $assignments[$varName] = $value
 
+                # Consume optional semicolons between assignment statements
                 Skip-LuaWhitespace
+                while ($script:luaPos -lt $script:luaString.Length -and
+                    $script:luaString[$script:luaPos] -eq ';') {
+                    $script:luaPos++
+                    Skip-LuaWhitespace
+                }
             }
 
             if ($script:luaAsPSCustomObject) {
