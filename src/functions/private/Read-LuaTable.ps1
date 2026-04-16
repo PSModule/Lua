@@ -88,7 +88,11 @@
                     $script:luaString[$script:luaPos] -eq '=') {
                     # Lua grammar: Name cannot be a reserved word (§3.1)
                     if ($ident -in $reservedWords) {
-                        throw "Reserved word '$ident' cannot be used as a bare identifier key in a Lua table. Use bracket notation: [\"$ident\"] = value."
+                        if ($script:luaSkipValidation) {
+                            Write-Warning "Reserved word '$ident' used as a bare identifier key at position $identStart."
+                        } else {
+                            throw "Reserved word '$ident' cannot be used as a bare identifier key in a Lua table. Use bracket notation: [`"$ident`"] = value."
+                        }
                     }
                     # Key = value pair
                     $script:luaPos++ # skip =

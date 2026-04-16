@@ -77,13 +77,17 @@
 
         # Output arrays as a single object instead of enumerating elements through the pipeline.
         [Parameter()]
-        [switch] $NoEnumerate
+        [switch] $NoEnumerate,
+
+        # Skip strict Lua grammar validation (e.g., reserved words as bare keys). Warnings are emitted instead of errors.
+        [Parameter()]
+        [switch] $SkipValidation
     )
 
     begin {}
 
     process {
-        $result = ConvertFrom-LuaTable -InputString $InputObject -AsPSCustomObject:(-not $AsHashtable) -MaxDepth $Depth
+        $result = ConvertFrom-LuaTable -InputString $InputObject -AsPSCustomObject:(-not $AsHashtable) -MaxDepth $Depth -SkipValidation:$SkipValidation
         if ($NoEnumerate -and $result -is [System.Array]) {
             Write-Output -InputObject $result -NoEnumerate
         } else {

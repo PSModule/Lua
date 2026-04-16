@@ -22,7 +22,11 @@
 
         # Maximum allowed nesting depth.
         [Parameter()]
-        [int] $MaxDepth = 1024
+        [int] $MaxDepth = 1024,
+
+        # Skip strict Lua grammar validation. Warnings are emitted instead of terminating errors.
+        [Parameter()]
+        [switch] $SkipValidation
     )
 
     begin {}
@@ -33,6 +37,7 @@
         $script:luaAsPSCustomObject = $AsPSCustomObject.IsPresent
         $script:luaMaxDepth = $MaxDepth
         $script:luaCurrentDepth = 0
+        $script:luaSkipValidation = $SkipValidation.IsPresent
 
         Skip-LuaWhitespace
 
@@ -110,7 +115,11 @@
 
                 # Lua grammar: variable names cannot be reserved words (§3.1)
                 if ($varName -in $reservedWords) {
-                    throw "Reserved word '$varName' cannot be used as a variable name at position $identStart."
+                    if ($script:luaSkipValidation) {
+                        Write-Warning "Reserved word '$varName' used as a variable name at position $identStart."
+                    } else {
+                        throw "Reserved word '$varName' cannot be used as a variable name at position $identStart."
+                    }
                 }
 
                 Skip-LuaWhitespace
