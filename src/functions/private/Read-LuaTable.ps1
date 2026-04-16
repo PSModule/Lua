@@ -13,6 +13,14 @@
     begin {}
 
     process {
+        # Lua 5.4 reserved words per §3.1
+        $reservedWords = @(
+            'and', 'break', 'do', 'else', 'elseif', 'end',
+            'false', 'for', 'function', 'goto', 'if', 'in',
+            'local', 'nil', 'not', 'or', 'repeat', 'return',
+            'then', 'true', 'until', 'while'
+        )
+
         $script:luaCurrentDepth++
         if ($script:luaCurrentDepth -gt $script:luaMaxDepth) {
             throw "Maximum nesting depth ($($script:luaMaxDepth)) exceeded."
@@ -78,6 +86,16 @@
 
                 if ($script:luaPos -lt $script:luaString.Length -and
                     $script:luaString[$script:luaPos] -eq '=') {
+                    # Lua grammar: Name cannot be a reserved word (§3.1)
+                    if ($ident -in $reservedWords) {
+                        if ($script:luaSkipValidation) {
+                            Write-Warning "Reserved word '$ident' used as a bare identifier key at position $identStart."
+                        } else {
+                            $msg = "Reserved word '$ident' cannot be used as a bare identifier key" +
+                                " in a Lua table. Use bracket notation: [`"$ident`"] = value."
+                            throw $msg
+                        }
+                    }
                     # Key = value pair
                     $script:luaPos++ # skip =
                     Skip-LuaWhitespace
