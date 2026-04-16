@@ -1,19 +1,43 @@
 ﻿<#
-  .SYNOPSIS
-    This is a general example of how to use the module.
+    .SYNOPSIS
+    Examples of how to use the Lua module.
 #>
 
 # Import the module
-Import-Module -Name 'PSModule'
+Import-Module -Name 'Lua'
 
-# Define the path to the font file
-$FontFilePath = 'C:\Fonts\CodeNewRoman\CodeNewRomanNerdFontPropo-Regular.tff'
+# Convert a PowerShell hashtable to Lua table notation
+$config = [ordered]@{
+    name    = 'ElvUI'
+    version = '13.74'
+    enabled = $true
+    scaling = 0.85
+    authors = @('Elv', 'Simpy', 'Blazeflack')
+}
+$luaOutput = $config | ConvertTo-Lua
+Write-Output $luaOutput
 
-# Install the font
-Install-Font -Path $FontFilePath -Verbose
+# Convert a Lua table string to a PowerShell object
+$luaString = @'
+{
+    name = "ElvUI",
+    version = "13.74",
+    enabled = true,
+    unitframes = {
+        playerWidth = 270,
+        playerHeight = 54
+    }
+}
+'@
+$result = $luaString | ConvertFrom-Lua
+Write-Output "Name: $($result.name)"
+Write-Output "Player Width: $($result.unitframes.playerWidth)"
 
-# List installed fonts
-Get-Font -Name 'CodeNewRomanNerdFontPropo-Regular'
+# Convert Lua to PSCustomObject
+$obj = '{ server = "localhost", port = 8080 }' | ConvertFrom-Lua
+Write-Output "Server: $($obj.server), Port: $($obj.port)"
 
-# Uninstall the font
-Get-Font -Name 'CodeNewRomanNerdFontPropo-Regular' | Uninstall-Font -Verbose
+# Compressed output
+$compressed = @(1, 2, 3, 4, 5) | ConvertTo-Lua -Compress
+Write-Output "Compressed: $compressed"
+

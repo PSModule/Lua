@@ -1,0 +1,118 @@
+{
+  "level1": {
+    "level2": {
+      "level3": {
+        "level4": {
+          "level5": {
+            "value": "deep",
+            "count": 42,
+            "active": true
+          },
+          "sibling": "level4-sibling"
+        },
+        "items": [
+          {
+            "id": 1,
+            "name": "item1",
+            "tags": [
+              "alpha",
+              "beta"
+            ]
+          },
+          {
+            "id": 2,
+            "name": "item2",
+            "tags": [
+              "gamma"
+            ]
+          }
+        ]
+      },
+      "metadata": {
+        "created": "2024-01-15",
+        "modified": "2024-06-20"
+      }
+    },
+    "name": "root-child"
+  },
+  "config": {
+    "database": {
+      "primary": {
+        "host": "db1.example.com",
+        "port": 5432,
+        "options": {
+          "ssl": true,
+          "timeout": 30,
+          "pool": {
+            "min": 5,
+            "max": 20,
+            "idle": 10000
+          }
+        }
+      },
+      "replica": {
+        "host": "db2.example.com",
+        "port": 5432,
+        "options": {
+          "ssl": true,
+          "timeout": 60,
+          "pool": {
+            "min": 2,
+            "max": 10,
+            "idle": 30000
+          }
+        }
+      }
+    },
+    "cache": {
+      "enabled": true,
+      "ttl": 3600,
+      "backends": [
+        {
+          "type": "memory",
+          "maxSize": 1048576
+        },
+        {
+          "type": "redis",
+          "host": "cache.example.com",
+          "port": 6379
+        }
+      ]
+    }
+  },
+  "matrix": [
+    [
+      1,
+      2,
+      3
+    ],
+    [
+      4,
+      5,
+      6
+    ],
+    [
+      7,
+      8,
+      9
+    ]
+  ],
+  "mixedDepth": {
+    "shallow": "yes",
+    "deep": {
+      "deeper": {
+        "deepest": {
+          "array": [
+            10,
+            20,
+            30
+          ],
+          "nested": {
+            "flag": false,
+            "label": "end"
+          }
+        }
+      }
+    }
+  }
+}
