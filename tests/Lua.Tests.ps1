@@ -507,6 +507,28 @@ B = { val = 2 }
         It 'Throws on assignment with missing value' {
             { ConvertFrom-Lua -InputObject 'A = ' } | Should -Throw '*Unexpected end of input*'
         }
+
+        It 'Throws on reserved word as bare table key' {
+            { ConvertFrom-Lua -InputObject '{ end = 1 }' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'Throws on reserved word as bare table key (while)' {
+            { ConvertFrom-Lua -InputObject '{ while = "loop" }' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'Allows reserved words in bracket notation' {
+            $result = ConvertFrom-Lua -InputObject '{ ["end"] = 1, ["while"] = 2 }' -AsHashtable
+            $result['end'] | Should -Be 1
+            $result['while'] | Should -Be 2
+        }
+
+        It 'Throws on reserved word as assignment variable name' {
+            { ConvertFrom-Lua -InputObject 'end = 1' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'Throws on reserved word as assignment variable name (return as assignment)' {
+            { ConvertFrom-Lua -InputObject 'return = 42' } | Should -Throw '*Reserved word*'
+        }
     }
 
     Context 'Pipeline input' {

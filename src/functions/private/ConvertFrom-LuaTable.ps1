@@ -81,6 +81,14 @@
         }
 
         if ($assignmentDetected) {
+            # Lua 5.4 reserved words per §3.1
+            $reservedWords = @(
+                'and', 'break', 'do', 'else', 'elseif', 'end',
+                'false', 'for', 'function', 'goto', 'if', 'in',
+                'local', 'nil', 'not', 'or', 'repeat', 'return',
+                'then', 'true', 'until', 'while'
+            )
+
             # Parse one or more assignment statements into an ordered dictionary
             $assignments = [ordered]@{}
             while ($script:luaPos -lt $script:luaString.Length) {
@@ -99,6 +107,11 @@
                     $script:luaPos++
                 }
                 $varName = $script:luaString.Substring($identStart, $script:luaPos - $identStart)
+
+                # Lua grammar: variable names cannot be reserved words (§3.1)
+                if ($varName -in $reservedWords) {
+                    throw "Reserved word '$varName' cannot be used as a variable name at position $identStart."
+                }
 
                 Skip-LuaWhitespace
 
