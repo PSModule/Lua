@@ -91,7 +91,9 @@
                         if ($script:luaSkipValidation) {
                             Write-Warning "Reserved word '$ident' used as a bare identifier key at position $identStart."
                         } else {
-                            throw "Reserved word '$ident' cannot be used as a bare identifier key in a Lua table. Use bracket notation: [`"$ident`"] = value."
+                            $msg = "Reserved word '$ident' cannot be used as a bare identifier key" +
+                                " in a Lua table. Use bracket notation: [`"$ident`"] = value."
+                            throw $msg
                         }
                     }
                     # Key = value pair
