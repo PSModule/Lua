@@ -88,10 +88,10 @@
 
     process {
         $convertParams = @{
-            InputString     = $InputObject
+            InputString      = $InputObject
             AsPSCustomObject = -not $AsHashtable
-            MaxDepth        = $Depth
-            SkipValidation  = $SkipValidation.IsPresent
+            MaxDepth         = $Depth
+            SkipValidation   = $SkipValidation.IsPresent
         }
         $result = ConvertFrom-LuaTable @convertParams
         if ($NoEnumerate -and $result -is [System.Array]) {
