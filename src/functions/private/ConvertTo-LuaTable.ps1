@@ -58,7 +58,7 @@
         # Enum handling
         if ($InputObject -is [enum]) {
             if ($EnumsAsStrings) {
-                $escaped = $InputObject.ToString() -replace '\\', '\\\\' -replace '"', '\"'
+                $escaped = $InputObject.ToString() -replace '\\', '\\' -replace '"', '\"'
                 return "`"$escaped`""
             }
             $underlyingType = [System.Enum]::GetUnderlyingType($InputObject.GetType())

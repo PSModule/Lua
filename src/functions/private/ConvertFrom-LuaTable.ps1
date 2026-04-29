@@ -22,7 +22,11 @@
 
         # Maximum allowed nesting depth.
         [Parameter()]
-        [int] $MaxDepth = 1024
+        [int] $MaxDepth = 1024,
+
+        # Skip strict Lua grammar validation. Warnings are emitted instead of terminating errors.
+        [Parameter()]
+        [switch] $SkipValidation
     )
 
     begin {}
@@ -33,6 +37,7 @@
         $script:luaAsPSCustomObject = $AsPSCustomObject.IsPresent
         $script:luaMaxDepth = $MaxDepth
         $script:luaCurrentDepth = 0
+        $script:luaSkipValidation = $SkipValidation.IsPresent
 
         Skip-LuaWhitespace
 
@@ -81,6 +86,14 @@
         }
 
         if ($assignmentDetected) {
+            # Lua 5.4 reserved words per §3.1
+            $reservedWords = @(
+                'and', 'break', 'do', 'else', 'elseif', 'end',
+                'false', 'for', 'function', 'goto', 'if', 'in',
+                'local', 'nil', 'not', 'or', 'repeat', 'return',
+                'then', 'true', 'until', 'while'
+            )
+
             # Parse one or more assignment statements into an ordered dictionary
             $assignments = [ordered]@{}
             while ($script:luaPos -lt $script:luaString.Length) {
@@ -99,6 +112,15 @@
                     $script:luaPos++
                 }
                 $varName = $script:luaString.Substring($identStart, $script:luaPos - $identStart)
+
+                # Lua grammar: variable names cannot be reserved words (§3.1)
+                if ($varName -cin $reservedWords) {
+                    if ($script:luaSkipValidation) {
+                        Write-Warning "Reserved word '$varName' used as a variable name at position $identStart."
+                    } else {
+                        throw "Reserved word '$varName' cannot be used as a variable name at position $identStart."
+                    }
+                }
 
                 Skip-LuaWhitespace
 

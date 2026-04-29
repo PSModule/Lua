@@ -507,6 +507,68 @@ B = { val = 2 }
         It 'Throws on assignment with missing value' {
             { ConvertFrom-Lua -InputObject 'A = ' } | Should -Throw '*Unexpected end of input*'
         }
+
+        It 'Throws on reserved word as bare table key' {
+            { ConvertFrom-Lua -InputObject '{ end = 1 }' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'Throws on reserved word as bare table key (while)' {
+            { ConvertFrom-Lua -InputObject '{ while = "loop" }' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'Allows reserved words in bracket notation' {
+            $result = ConvertFrom-Lua -InputObject '{ ["end"] = 1, ["while"] = 2 }' -AsHashtable
+            $result['end'] | Should -Be 1
+            $result['while'] | Should -Be 2
+        }
+
+        It 'Allows capitalized reserved words as bare table keys (Lua keywords are case-sensitive)' {
+            $result = ConvertFrom-Lua -InputObject '{ End = 1, While = "loop" }' -AsHashtable
+            $result['End'] | Should -Be 1
+            $result['While'] | Should -Be 'loop'
+        }
+
+        It 'Allows capitalized reserved words as assignment variable names (Lua keywords are case-sensitive)' {
+            $result = ConvertFrom-Lua -InputObject 'End = 1' -AsHashtable
+            $result['End'] | Should -Be 1
+        }
+
+        It 'Throws on reserved word as assignment variable name' {
+            { ConvertFrom-Lua -InputObject 'end = 1' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'Throws on reserved word as assignment variable name (while as assignment)' {
+            { ConvertFrom-Lua -InputObject 'while = 42' } | Should -Throw '*Reserved word*'
+        }
+
+        It 'SkipValidation allows reserved word as bare table key with warning' {
+            $result = ConvertFrom-Lua -InputObject '{ end = 1 }' -AsHashtable -SkipValidation 3>&1
+            $warnings = $result | Where-Object { $_ -is [System.Management.Automation.WarningRecord] }
+            $output = $result | Where-Object { $_ -isnot [System.Management.Automation.WarningRecord] }
+            $warnings.Message | Should -BeLike '*Reserved word*end*'
+            $output['end'] | Should -Be 1
+        }
+
+        It 'SkipValidation allows reserved word as assignment variable name with warning' {
+            $result = ConvertFrom-Lua -InputObject 'end = 1' -AsHashtable -SkipValidation 3>&1
+            $warnings = $result | Where-Object { $_ -is [System.Management.Automation.WarningRecord] }
+            $output = $result | Where-Object { $_ -isnot [System.Management.Automation.WarningRecord] }
+            $warnings.Message | Should -BeLike '*Reserved word*end*'
+            $output['end'] | Should -Be 1
+        }
+
+        It 'SkipValidation emits a warning for each reserved word occurrence' {
+            $result = ConvertFrom-Lua -InputObject '{ end = 1, while = 2, for = 3 }' -AsHashtable -SkipValidation 3>&1
+            $warnings = @($result | Where-Object { $_ -is [System.Management.Automation.WarningRecord] })
+            $output = $result | Where-Object { $_ -isnot [System.Management.Automation.WarningRecord] }
+            $warnings.Count | Should -Be 3
+            $warnings[0].Message | Should -BeLike '*end*'
+            $warnings[1].Message | Should -BeLike '*while*'
+            $warnings[2].Message | Should -BeLike '*for*'
+            $output['end'] | Should -Be 1
+            $output['while'] | Should -Be 2
+            $output['for'] | Should -Be 3
+        }
     }
 
     Context 'Pipeline input' {
