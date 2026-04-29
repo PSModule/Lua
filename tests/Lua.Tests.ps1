@@ -522,6 +522,17 @@ B = { val = 2 }
             $result['while'] | Should -Be 2
         }
 
+        It 'Allows capitalized reserved words as bare table keys (Lua keywords are case-sensitive)' {
+            $result = ConvertFrom-Lua -InputObject '{ End = 1, While = "loop" }' -AsHashtable
+            $result['End'] | Should -Be 1
+            $result['While'] | Should -Be 'loop'
+        }
+
+        It 'Allows capitalized reserved words as assignment variable names (Lua keywords are case-sensitive)' {
+            $result = ConvertFrom-Lua -InputObject 'End = 1' -AsHashtable
+            $result['End'] | Should -Be 1
+        }
+
         It 'Throws on reserved word as assignment variable name' {
             { ConvertFrom-Lua -InputObject 'end = 1' } | Should -Throw '*Reserved word*'
         }

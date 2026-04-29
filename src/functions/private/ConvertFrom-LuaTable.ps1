@@ -114,7 +114,7 @@
                 $varName = $script:luaString.Substring($identStart, $script:luaPos - $identStart)
 
                 # Lua grammar: variable names cannot be reserved words (§3.1)
-                if ($varName -in $reservedWords) {
+                if ($varName -cin $reservedWords) {
                     if ($script:luaSkipValidation) {
                         Write-Warning "Reserved word '$varName' used as a variable name at position $identStart."
                     } else {

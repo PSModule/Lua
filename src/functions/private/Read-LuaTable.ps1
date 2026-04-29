@@ -87,7 +87,7 @@
                 if ($script:luaPos -lt $script:luaString.Length -and
                     $script:luaString[$script:luaPos] -eq '=') {
                     # Lua grammar: Name cannot be a reserved word (§3.1)
-                    if ($ident -in $reservedWords) {
+                    if ($ident -cin $reservedWords) {
                         if ($script:luaSkipValidation) {
                             Write-Warning "Reserved word '$ident' used as a bare identifier key at position $identStart."
                         } else {
